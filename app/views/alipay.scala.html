@@ -1,0 +1,99 @@
+@(server: String,pay: String)
+
+<html ng-app="app">
+    <head>
+        <script type="text/javascript">
+
+        var myWebSocket;
+
+        function log(msg){
+            var ot = document.getElementById("output");
+            ot.value = ot.value+"\n"+msg;
+            console.log(msg)
+        }
+
+        function pay(){
+            var oIframe = document.getElementById("subwin");
+            var win = oIframe.contentWindow || oIframe.contentDocument;
+            win.location="@pay"
+        }
+
+        function clean(){
+            document.getElementById("output").value="";
+        }
+
+        function connectToWS() {
+            var endpoint = document.getElementById("endpoint").value;
+            if (myWebSocket !== undefined) {
+                myWebSocket.close()
+            }
+
+            myWebSocket = new WebSocket(endpoint);
+
+            myWebSocket.onmessage = function (event) {
+                var leng;
+                if (event.data.size === undefined) {
+                    leng = event.data.length
+                } else {
+                    leng = event.data.size
+                }
+                log("onmessage. size: " + leng + ", content: " + event.data);
+            }
+
+            myWebSocket.onopen = function (evt) {
+                log("onopen."+evt);
+            };
+
+            myWebSocket.onclose = function (evt) {
+                log("onclose."+evt);
+            };
+
+            myWebSocket.onerror = function (evt) {
+                log("Error!"+evt);
+            };
+        }
+
+        function sendMsg() {
+            var message = document.getElementById("myMessage").value;
+            myWebSocket.send(message);
+        }
+
+        function closeConn() {
+            myWebSocket.close();
+        }
+
+    </script>
+    </head>
+    <body>
+        <pre>
+过程说明：
+0.三个角色：客户端，支付服务，第三方支付API
+1.客户端（当前页面）请求支付服务（“打开支付连接”模拟）。
+2.支付服务，返回一个第三方支付连接（“切换付款状态”模拟）。
+3.支付服务，在服务器端轮询获取第三方支付结果。（调试，把服务器信息输出到客户端）。
+4.支付服务，得到第三方付款成功或失败后，把结果返回给客户端（模拟支付成功）。
+
+测试过程：
+1.点击“打开支付连接”
+2.点击“模拟付款”
+3.等待一小会，点击“切换付款状态”
+4.点击“关闭连接”
+        </pre>
+        connection to:<br>
+        <input type="text" id="endpoint" size="80" value="ws://@server"><br>
+        message:<br>
+        <textarea type="text" id="myMessage" rows="5" cols="80" >
+{
+    "id":"pay-id"
+}
+        </textarea><br>
+        <input type="button" onclick="connectToWS()" value="打开支付连接"/>
+        <input type="button" style="background-color:#FF6600" onclick="sendMsg()" value="模拟付款"/>
+        <input type="button" style="background-color:#FF66FF" onclick="pay()" value="切换付款状态"/>
+        <input type="button" onclick="closeConn()" value="关闭连接"/>
+        <input type="button" onclick="clean()" value="清除输出"/><br>
+        output: <br>
+        <textarea id="output" rows="20" cols="80" > </textarea>
+        <iframe id="subwin" src="about:blank" style="visibility: hidden" ></iframe>
+    </body>
+</html>

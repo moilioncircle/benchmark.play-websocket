@@ -1,0 +1,92 @@
+@(server: String)
+
+<html ng-app="app">
+    <head>
+        <script type="text/javascript">
+
+        var myWebSocket;
+
+        function log(msg){
+            var ot = document.getElementById("output");
+            ot.value = ot.value+"\n"+msg;
+            console.log(msg)
+        }
+
+        function clean(){
+            document.getElementById("output").value="";
+        }
+
+        function connectToWS() {
+            var endpoint = document.getElementById("endpoint").value;
+            if (myWebSocket !== undefined) {
+                myWebSocket.close()
+            }
+
+            myWebSocket = new WebSocket(endpoint);
+
+            myWebSocket.onmessage = function (event) {
+                var leng;
+                if (event.data.size === undefined) {
+                    leng = event.data.length
+                } else {
+                    leng = event.data.size
+                }
+                log("onmessage. size: " + leng + ", content: " + event.data);
+            }
+
+            myWebSocket.onopen = function (evt) {
+                log("onopen."+evt);
+            };
+
+            myWebSocket.onclose = function (evt) {
+                log("onclose."+evt);
+            };
+
+            myWebSocket.onerror = function (evt) {
+                log("Error!"+evt);
+            };
+        }
+
+        function sendMsg() {
+            var message = document.getElementById("myMessage").value;
+            myWebSocket.send(message);
+        }
+
+        function closeConn() {
+            myWebSocket.close();
+        }
+
+    </script>
+    </head>
+    <body>
+        <pre>
+过程说明：
+0.三个角色：客户端，网关服务器，业务服务器
+1.客户端（当前页面）启动后保持和网关的连接（“打开连接”模拟）。
+2.客户端，定时发送心跳Json到网关。
+3.网关把心跳Post到业务服务器，业务服务器返回成功信息。
+4.网关把业务信息发给客户端。
+
+测试过程：
+1.点击“打开连接”
+2.点击“发送心跳”
+3.点击“关闭连接”
+        </pre>
+        connection to:<br>
+            <input type="text" id="endpoint" size="80" value="ws://@server"><br>
+            message:<br>
+            <textarea type="text" id="myMessage" rows="5" cols="80" >
+{
+    "id":"termimal-id",
+    "status":"active",
+    "gps":"112.123456,37.654321"
+}
+            </textarea><br>
+            <input type="button" onclick="connectToWS()" value="打开连接"/>
+            <input type="button" style="background-color:#FF6600" onclick="sendMsg()" value="发送心跳"/>
+            <input type="button" onclick="closeConn()" value="关闭连接"/>
+            <input type="button" onclick="clean()" value="清除输出"/><br>
+        output: <br>
+        <textarea id="output" rows="20" cols="80" > </textarea>
+    </body>
+</html>
