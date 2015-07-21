@@ -7,7 +7,7 @@
 
 心跳演示，模拟了`客户端`通过`网关服务器`向`业务服务器`发送心跳的过程。
 
-支付演示，模拟了第三方支付的过程，参与者有`客户端`，‘支付服务’，`第三方支付`。
+支付演示，模拟了第三方支付的过程，参与者有`客户端`，`支付服务`，`第三方支付`。
 
 `客户端`向`支付服务`发送支付请求，然后`客户端`定向到`第三方支付`页面支付。
 `支付服务`轮询`第三方支付`获得结果，反馈给`客户端`
@@ -76,11 +76,11 @@ esac
 
 开启压力测试，需要调整系统参数 /etc/sysctl.conf，自行搜索吧。
 比较理想的压力测试是，在内网服务器A和B上分别运行服务和测试。
-打开`-k`指标高，`-c`超过1000，可能瓶颈在ab。
 
 安装 ab
 
-`sudo apt-get install apach2-utls` `yum install httpd-tools`
+`sudo apt-get install apach2-utls`  
+`yum install httpd-tools`
 
 ```
 Server Software:        
@@ -109,4 +109,35 @@ Connect:        0    3  58.2      0    1006
 Processing:     0   13   8.7     12      81
 Waiting:        0   13   8.7     12      81
 Total:          0   17  59.1     12    1040
+```
+
+## 经验数据
+
+scala的spray能开到120k左右
+
+keepalive和不keepalive大概差一个数量级
+3000以上的并发的瓶颈出现在ab 而不是服务器
+一般`-c` 1000是比较合理的
+
+```
+netty @ i7 4790k 4.4GHz + 32G
+
+Server Software:
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /test_get?aa=111&bb=222
+Document Length:        90 bytes
+
+Concurrency Level:      1000
+Time taken for tests:   0.586 seconds
+Complete requests:      100000
+Failed requests:        0
+Keep-Alive requests:    100000
+Total transferred:      19400000 bytes
+HTML transferred:       9000000 bytes
+Requests per second:    170606.83 [#/sec] (mean)
+Time per request:       5.861 [ms] (mean)
+Time per request:       0.006 [ms] (mean, across all concurrent requests)
+Transfer rate:          32322.00 [Kbytes/sec] received
 ```

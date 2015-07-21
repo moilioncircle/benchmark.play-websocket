@@ -3,18 +3,18 @@
 # ~~~~
 
 # Home page
-GET         /                        controllers.Application.index
-GET         /hello-world             controllers.Application.helloWorld
-GET         /datetime                controllers.Application.datetime
+GET         /                        controllers.Application.index()
+GET         /hello-world             controllers.Application.helloWorld()
+GET         /datetime                controllers.Application.datetime()
 GET         /sleep/:ms               controllers.Application.sleep(ms:Long)
 
 # heartbeat:
 # 1.client->server
 # 1.server->master
 # 1.server->client
-GET         /heartbeat               controllers.Heartbeat.heartbeat
-GET         /heartbeat-server        controllers.Heartbeat.heartbeatServer
-POST        /heartbeat-master        controllers.Heartbeat.heartbeatMaster
+GET         /heartbeat               controllers.Heartbeat.heartbeat()
+GET         /heartbeat-server        controllers.Heartbeat.heartbeatServer()
+POST        /heartbeat-master        controllers.Heartbeat.heartbeatMaster()
 
 # alipay:
 # 1. client->server
@@ -22,10 +22,10 @@ POST        /heartbeat-master        controllers.Heartbeat.heartbeatMaster
 # 3. server->alipay-ack
 # 4. server->client
 
-GET         /alipay                  controllers.Alipay.alipay
-GET         /alipay-server           controllers.Alipay.alipayServer
-GET         /alipay-req              controllers.Alipay.alipayReq
-GET         /alipay-ack              controllers.Alipay.alipayAck
+GET         /alipay                  controllers.Alipay.alipay()
+GET         /alipay-server           controllers.Alipay.alipayServer()
+GET         /alipay-req              controllers.Alipay.alipayReq()
+GET         /alipay-ack              controllers.Alipay.alipayAck()
 
 
 # Map static resources from the /public folder to the /assets URL path

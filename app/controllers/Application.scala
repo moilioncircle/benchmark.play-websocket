@@ -11,7 +11,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
  * trydofor@moilioncircle.com 2015-07-20
  */
 
-class Application extends Controller {
+object Application extends Controller {
 
   def index = Action {
     Ok(views.html.index())

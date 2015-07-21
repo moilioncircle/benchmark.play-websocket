@@ -12,7 +12,7 @@ import play.api.mvc._
  * trydofor@moilioncircle.com 2015-07-20
  */
 
-class Heartbeat extends Controller {
+object Heartbeat extends Controller {
 
   def  heartbeat = Action { request =>
     val host = request.host

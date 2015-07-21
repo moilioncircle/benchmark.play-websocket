@@ -16,7 +16,7 @@ import scala.concurrent.duration._
  * trydofor@moilioncircle.com 2015-07-20
  */
 
-class Alipay extends Controller {
+object Alipay extends Controller {
 
   def alipay = Action { request =>
     val host = request.host
