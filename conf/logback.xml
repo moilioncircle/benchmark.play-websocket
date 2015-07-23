@@ -24,9 +24,10 @@
       This configures the log level to log at for a package and its children packages.
     -->
     <logger name="play" level="INFO"/>
-    <logger name="application" level="DEBUG"/>
+    <logger name="debug" level="DEBUG"/>
 
     <root level="WARN">
+        <appender-ref ref="STDOUT"/>
         <appender-ref ref="ASYNCFILE"/>
     </root>
 

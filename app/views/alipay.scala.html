@@ -12,10 +12,10 @@
             console.log(msg)
         }
 
-        function pay(){
+        function pay(status){
             var oIframe = document.getElementById("subwin");
             var win = oIframe.contentWindow || oIframe.contentDocument;
-            win.location="@pay"
+            win.location="@pay".replace(/\d+$/,status)
         }
 
         function clean(){
@@ -89,7 +89,10 @@
         </textarea><br>
         <input type="button" onclick="connectToWS()" value="打开支付连接"/>
         <input type="button" style="background-color:#FF6600" onclick="sendMsg()" value="模拟付款"/>
-        <input type="button" style="background-color:#FF66FF" onclick="pay()" value="切换付款状态"/>
+        <input type="button" style="background-color:#FF66FF" onclick="pay(0)" value="等待付款"/>
+        <input type="button" style="background-color:#FF66FF" onclick="pay(1)" value="成功付款"/>
+        <input type="button" style="background-color:#FF66FF" onclick="pay(2)" value="付款超时"/>
+        <input type="button" style="background-color:#FF66FF" onclick="pay(3)" value="内部错误"/>
         <input type="button" onclick="closeConn()" value="关闭连接"/>
         <input type="button" onclick="clean()" value="清除输出"/><br>
         output: <br>

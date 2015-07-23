@@ -4,13 +4,14 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.{Actor, ActorRef, Props}
 import play.api.Logger
+import play.api.Play.current
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.libs.ws.WS
 import play.api.mvc._
-import play.api.Play.current
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 /**
  * trydofor@moilioncircle.com 2015-07-20
@@ -18,28 +19,49 @@ import scala.concurrent.duration._
 
 object Alipay extends Controller {
 
+  val logger = Logger("debug")
+  val defaultTimeout = 1000
+
   def alipay = Action { request =>
     val host = request.host
     val server = routes.Alipay.alipayServer
-    val pay = routes.Alipay.alipayReq.url
+    val pay = routes.Alipay.alipayReq(0).url
     Ok(views.html.alipay(host + server, pay))
   }
 
-  val counter = new AtomicInteger(1)
+  val counter = new AtomicInteger(0)
 
-  def alipayReq = Action {
-    val next = counter.addAndGet(1)
-    Ok(s"""<script>parent.log("pay-times:$next,result:${next % 2 == 0}")</script>""").as(HTML)
+  val PayWaiting = 0
+  val PaySuccess = 1
+  val PayTimeout = 2
+  val PayException = 3
+
+  def status(st: Int) = st match {
+    case PayWaiting => "waiting"
+    case PaySuccess => "success"
+    case PayTimeout => "timeout"
+    case PayException => "exception"
+  }
+
+  def alipayReq(i: Int) = Action {
+    counter.set(i)
+    val tm = counter.get()
+    val ok = status(tm)
+    Ok( s"""<script>parent.log("result:$ok")</script>""").as(HTML)
   }
 
   def alipayAck = Action {
     val tm = counter.get()
-    val ok = tm % 2 == 0
+    if (PayTimeout == tm) {
+      Thread.sleep(defaultTimeout * 2)
+      logger.info(s"simulate timeout")
+    }
+
     Ok(
       s"""
         {
-          "success":$ok,
-          "times":$tm
+          "result":"${status(tm)}",
+          "status":$tm
         }
       """)
   }
@@ -57,24 +79,40 @@ object Alipay extends Controller {
   }
 
   class AlipayActor(out: ActorRef, url: String) extends Actor {
-    val logger = Logger(AlipayActor.getClass)
     val interval = 1.second
 
     def receive = {
       case msg: JsValue =>
-        logger.info(url)
-        val request = WS.url(url).withRequestTimeout(10000)
+        val request = WS.url(url).withRequestTimeout(defaultTimeout)
         val response = request.get()
-        response.map { r =>
-          val rjson = Json.parse(r.body)
-          val success = (rjson \ "success").get.as[Boolean]
-          if (success) {
-            out ! rjson
-          } else {
-            out ! Json.obj("retry" -> ("retry at ms=" + System.currentTimeMillis()))
+        response.onComplete {
+          case Success(r) =>
+            val rjson = Json.parse(r.body)
+            val status = (rjson \ "status").get.as[Int]
+            status match {
+              case PaySuccess => out ! rjson
+              case PayException => throw new IllegalStateException("simulate actor Exception")
+              case _ =>
+                out ! Json.obj("retry" -> rjson)
+                context.system.scheduler.scheduleOnce(interval, self, msg)
+            }
+          case Failure(t) => // timeout exception
+            out ! Json.obj("retry" -> ("got-exception=" + t.getMessage))
             context.system.scheduler.scheduleOnce(interval, self, msg)
-          }
         }
+    }
+
+    override def preStart(): Unit = {
+      logger.info("pre-start")
+    }
+
+    override def postStop(): Unit = {
+      logger.info("post-stop")
+    }
+
+    override def postRestart(reason: Throwable): Unit = {
+      logger.info("post-restart")
+      super.postRestart(reason)
     }
   }
 

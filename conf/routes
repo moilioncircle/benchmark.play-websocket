@@ -24,7 +24,7 @@ POST        /heartbeat-master        controllers.Heartbeat.heartbeatMaster()
 
 GET         /alipay                  controllers.Alipay.alipay()
 GET         /alipay-server           controllers.Alipay.alipayServer()
-GET         /alipay-req              controllers.Alipay.alipayReq()
+GET         /alipay-req              controllers.Alipay.alipayReq(status:Int)
 GET         /alipay-ack              controllers.Alipay.alipayAck()
 
 
