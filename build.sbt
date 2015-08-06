@@ -5,7 +5,8 @@ scalaVersion := "2.11.6"
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 libraryDependencies ++= Seq(
-  ws
+  ws,
+  cache
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"

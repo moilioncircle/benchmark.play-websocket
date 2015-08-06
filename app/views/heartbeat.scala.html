@@ -71,6 +71,11 @@
 1.点击“打开连接”
 2.点击“发送心跳”
 3.点击“关闭连接”
+
+给客户端发消息（id）:
+1.打开多个本页面，修改的json的id，然后发送。
+2.点击“发送命令”，打开命令页码，URL最后段为id
+3.查看该id窗口的输出
         </pre>
         connection to:<br>
             <input type="text" id="endpoint" size="80" value="ws://@server"><br>
@@ -85,6 +90,7 @@
             <input type="button" onclick="connectToWS()" value="打开连接"/>
             <input type="button" style="background-color:#FF6600" onclick="sendMsg()" value="发送心跳"/>
             <input type="button" onclick="closeConn()" value="关闭连接"/>
+            <input type="button" onclick="window.open('/command/termimal-id')" value="发送命令"/>
             <input type="button" onclick="clean()" value="清除输出"/><br>
         output: <br>
         <textarea id="output" rows="20" cols="80" > </textarea>

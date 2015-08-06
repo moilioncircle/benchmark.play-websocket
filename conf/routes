@@ -12,6 +12,7 @@ GET         /sleep/:ms               controllers.Application.sleep(ms:Long)
 # 1.client->server
 # 1.server->master
 # 1.server->client
+GET         /command/:id              controllers.Heartbeat.command(id:String)
 GET         /heartbeat               controllers.Heartbeat.heartbeat()
 GET         /heartbeat-server        controllers.Heartbeat.heartbeatServer()
 POST        /heartbeat-master        controllers.Heartbeat.heartbeatMaster()

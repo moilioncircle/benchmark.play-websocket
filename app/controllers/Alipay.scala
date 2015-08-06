@@ -67,6 +67,7 @@ object Alipay extends Controller {
   }
 
   def alipayServer = WebSocket.acceptWithActor[JsValue, JsValue] { request => out =>
+    logger.info(s"get a alipay-websocket from ${request.remoteAddress}")
     val host = request.host
     val server = routes.Alipay.alipayAck
     val url = "http://" + host + server
@@ -88,7 +89,7 @@ object Alipay extends Controller {
         response.onComplete {
           case Success(r) =>
             val rjson = Json.parse(r.body)
-            val status = (rjson \ "status").get.as[Int]
+            val status = (rjson \ "status").as[Int]
             status match {
               case PaySuccess => out ! rjson
               case PayException => throw new IllegalStateException("simulate actor Exception")
