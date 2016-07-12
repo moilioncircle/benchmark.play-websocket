@@ -144,3 +144,8 @@ Time per request:       5.861 [ms] (mean)
 Time per request:       0.006 [ms] (mean, across all concurrent requests)
 Transfer rate:          32322.00 [Kbytes/sec] received
 ```
+
+## 补充链接
+
+有关操作的视频
+http://www.moilioncircle.com/release/018.live.rush-scala-websocket.html
